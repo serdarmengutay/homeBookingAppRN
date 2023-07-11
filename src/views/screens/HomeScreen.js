@@ -20,6 +20,7 @@ const cardWidth = width / 1.8;
 
 const HomeScreen = ({ navigation }) => {
   const [selectedCategoryIndex, setSelectedCategoryIndex] = useState(0);
+  const [activeCardIndex, setActiveCardIndex] = useState(0)
   const scrollX = React.useRef(new Animated.Value(0)).current;
 
   const categories = ["All", "Popular", "Top Rated", "Featured", "Luxury"];
@@ -71,7 +72,10 @@ const HomeScreen = ({ navigation }) => {
       outputRange: [0.8, 1, 0.8],
     });
     return (
-      <TouchableOpacity activeOpacity={1} onPress={() => navigation.navigate('DetailsScreen', hotel)}>
+      <TouchableOpacity 
+      activeOpacity={1} 
+      disabled={activeCardIndex != index}
+      onPress={() => navigation.navigate('DetailsScreen', hotel)}>
         <Animated.View style={{ ...styles.card, transform: [{ scale }] }}>
           <Animated.View style={{ ...styles.cardOverlay, opacity }} />
           <View style={styles.priceTag}>
@@ -201,6 +205,9 @@ const HomeScreen = ({ navigation }) => {
         <CategoryList />
         <View>
           <Animated.FlatList
+            onMomentumScrollEnd={(e) => {
+              setActiveCardIndex(Math.round(e.nativeEvent.contentOffset.x / cardWidth))
+            }}
             onScroll={Animated.event(
               [{ nativeEvent: { contentOffset: { x: scrollX } } }],
               { useNativeDriver: true }
